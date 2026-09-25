@@ -8,6 +8,13 @@ RUN apt-get update && apt-get install -y python3 make g++ git && rm -rf /var/lib
 COPY package.json package-lock.json turbo.json tsconfig.json api-extractor.json tsdoc.json aliases.mjs ./
 COPY packages/ ./packages/
 
+ENV MEDPLUM_BASE_URL="__MEDPLUM_BASE_URL__" \
+    MEDPLUM_CLIENT_ID="__MEDPLUM_CLIENT_ID__" \
+    MEDPLUM_REGISTER_ENABLED="__MEDPLUM_REGISTER_ENABLED__" \
+    MEDPLUM_AWS_TEXTRACT_ENABLED="__MEDPLUM_AWS_TEXTRACT_ENABLED__" \
+    GOOGLE_CLIENT_ID="__GOOGLE_CLIENT_ID__" \
+    RECAPTCHA_SITE_KEY="__RECAPTCHA_SITE_KEY__"
+
 RUN npm ci --include=dev && \
     npx turbo run build --filter=@medplum/app...
 
