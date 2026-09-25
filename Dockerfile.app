@@ -5,7 +5,7 @@ WORKDIR /usr/src/medplum
 
 RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
-COPY package.json package-lock.json turbo.json tsconfig.json ./
+COPY package.json package-lock.json turbo.json tsconfig.json api-extractor.json tsdoc.json ./
 COPY packages/ ./packages/
 
 RUN npm ci --include=dev && \
