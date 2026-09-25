@@ -3,9 +3,9 @@ FROM node:22-bookworm-slim AS builder
 
 WORKDIR /usr/src/medplum
 
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3 make g++ git && rm -rf /var/lib/apt/lists/*
 
-COPY package.json package-lock.json turbo.json tsconfig.json api-extractor.json tsdoc.json ./
+COPY package.json package-lock.json turbo.json tsconfig.json api-extractor.json tsdoc.json aliases.mjs ./
 COPY packages/ ./packages/
 
 RUN npm ci --include=dev && \
