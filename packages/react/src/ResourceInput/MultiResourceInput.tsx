@@ -100,7 +100,7 @@ function toOption<T extends Resource>(resource: T): AsyncAutocompleteOption<T> {
  * @returns The search parameter to use for the autocomplete input.
  */
 function getSearchParamForResourceType(resourceType: string): string {
-  return SEARCH_CODES[resourceType] ?? (NAME_RESOURCE_TYPES.includes(resourceType) ? 'name' : '_id');
+  return SEARCH_CODES[resourceType] ?? (NAME_RESOURCE_TYPES.includes(resourceType) ? 'name:contains' : '_id');
 }
 
 /**
@@ -200,7 +200,8 @@ export function MultiResourceInput<T extends Resource = Resource>(
       const searchCode = getSearchParamForResourceType(resourceType);
       const searchParams = new URLSearchParams({
         [searchCode]: input ?? '',
-        _count: '10',
+        _count: '50',
+        _sort: '-_lastUpdated',
         ...searchCriteria,
       });
 

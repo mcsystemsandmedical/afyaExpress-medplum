@@ -107,7 +107,7 @@ export async function expandOperator(
   }
 
   if (params.filter && !params.count) {
-    params.count = 10; // Default to small page size for typeahead queries
+    params.count = 50; // Default to reasonable page size for typeahead queries
   }
   const result = await expandValueSet(repo, valueSet, params);
 
@@ -452,9 +452,8 @@ function buildFilterPredicate(
   tableName: string,
   displayLanguage?: string
 ): Expression {
-  // Below 3 characters the display-substring branch cannot use the trigram GIN index
-  // (a substring needs at least one full trigram), so match on the code alone.
-  const matchDisplay = filterText.length >= 3;
+  // Below 2 characters the display-substring branch cannot use trigrams, so match on the code alone.
+  const matchDisplay = filterText.length >= 2;
 
   // Restrict the `code` branch to canonical rows: synonyms for the same code are redundant. This scoping lets the planner
   // use the partial `(system, lower(code)) WHERE "synonymOf" IS NULL` index, keeping the `code` branch of the query plan
@@ -488,8 +487,11 @@ function buildFilterPredicate(
 }
 
 function buildCodeMatch(filterText: string, tableName: string): Expression {
-  return filterText.length >= 3
-    ? new Condition(new Column(tableName, 'code'), 'LOWER_LIKE', `${escapeLikeString(filterText)}%`)
+  return filterText.length >= 2
+    ? new Disjunction([
+        new Condition(new Column(tableName, 'code'), 'LOWER_LIKE', `%${escapeLikeString(filterText)}%`),
+        new Condition(new Column(tableName, 'code'), '=', filterText),
+      ])
     : new Condition(new Column(tableName, 'code'), '=', filterText);
 }
 
